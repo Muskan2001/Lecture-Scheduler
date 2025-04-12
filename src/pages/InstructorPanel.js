@@ -2,18 +2,35 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { markAttendance } from '../features/lectures/lectureSlice';
 
+import {
+  Typography,
+  TextField,
+  Select,
+  MenuItem,
+  Card,
+  CardContent,
+  Grid,
+  Button,
+  Box,
+  InputLabel,
+  FormControl,
+} from '@mui/material';
+
 const InstructorPanel = () => {
   const dispatch = useDispatch();
   const lectures = useSelector((state) => state.lectures.lectures);
-  const instructors = useSelector((state) => state.instructor.instructors);
   const courses = useSelector((state) => state.courses.courses);
 
   const [filters, setFilters] = useState({
-    instructorId: '1', // Simulating logged-in instructor (dummy ID)
+    instructorId: '1', // Simulate logged-in instructor
     searchCourse: '',
     date: '',
     attendance: '',
   });
+
+  const handleChange = (e) => {
+    setFilters({ ...filters, [e.target.name]: e.target.value });
+  };
 
   const filteredLectures = lectures.filter((lec) => {
     const course = courses.find((c) => c.id === lec.courseId);
@@ -30,68 +47,91 @@ const InstructorPanel = () => {
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Instructor Panel</h2>
+    <div style={{ padding: '1rem' }}>
+      <Typography variant="h4" gutterBottom>Instructor Panel</Typography>
 
-      {/* Filters */}
-      <div className="space-y-2 mb-4">
-        <input
-          type="text"
-          placeholder="Search by course name"
-          value={filters.searchCourse}
-          onChange={(e) => setFilters({ ...filters, searchCourse: e.target.value })}
-          className="border p-1 block w-full"
-        />
-        <input
-          type="date"
-          value={filters.date}
-          onChange={(e) => setFilters({ ...filters, date: e.target.value })}
-          className="border p-1 block w-full"
-        />
-        <select
-          value={filters.attendance}
-          onChange={(e) => setFilters({ ...filters, attendance: e.target.value })}
-          className="border p-1 block w-full"
-        >
-          <option value="">All Attendance</option>
-          <option value="Attended">Attended</option>
-          <option value="Not Attended">Not Attended</option>
-        </select>
-      </div>
+      {/* Filter Form */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={4}>
+          <TextField
+            label="Search by Course Name"
+            name="searchCourse"
+            fullWidth
+            value={filters.searchCourse}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <TextField
+            label="Filter by Date"
+            type="date"
+            name="date"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            value={filters.date}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <FormControl fullWidth>
+            <InputLabel>Attendance</InputLabel>
+            <Select
+              name="attendance"
+              value={filters.attendance}
+              label="Attendance"
+              onChange={handleChange}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="Attended">Attended</MenuItem>
+              <MenuItem value="Not Attended">Not Attended</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
 
       {/* Lecture List */}
-      <ul className="space-y-3">
+      <Grid container spacing={2}>
         {filteredLectures.map((lec) => {
           const course = courses.find((c) => c.id === lec.courseId);
           return (
-            <li key={lec.id} className="border p-3">
-              <p>
-                <strong>Course:</strong> {course?.name}
-              </p>
-              <p>
-                <strong>Date:</strong> {lec.date} | <strong>Time:</strong> {lec.time}
-              </p>
-              <p>
-                <strong>Status:</strong> {lec.attendance}
-              </p>
-              <div className="mt-2 space-x-2">
-                <button
-                  onClick={() => handleAttendance(lec.id, 'Attended')}
-                  className="bg-green-500 text-white px-2 py-1 rounded"
-                >
-                  Mark Attended
-                </button>
-                <button
-                  onClick={() => handleAttendance(lec.id, 'Not Attended')}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                >
-                  Mark Not Attended
-                </button>
-              </div>
-            </li>
+            <Grid item xs={12} sm={6} md={4} key={lec.id}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">{course?.name}</Typography>
+                  <Typography variant="body2">
+                    <strong>Date:</strong> {lec.date} <br />
+                    <strong>Time:</strong> {lec.time} <br />
+                    <strong>Duration:</strong> {lec.duration} min
+                  </Typography>
+                  <Typography variant="subtitle2" sx={{ mt: 1 }}>
+                    Attendance: <strong>{lec.attendance}</strong>
+                  </Typography>
+
+                  <Box sx={{ mt: 2 }}>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="success"
+                      sx={{ mr: 1 }}
+                      onClick={() => handleAttendance(lec.id, 'Attended')}
+                    >
+                      Mark Attended
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="error"
+                      onClick={() => handleAttendance(lec.id, 'Not Attended')}
+                    >
+                      Mark Not Attended
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
           );
         })}
-      </ul>
+      </Grid>
     </div>
   );
 };

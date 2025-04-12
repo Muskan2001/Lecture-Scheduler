@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { scheduleLecture } from '../features/lectures/lectureSlice';
 
+import {
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+  TextField,
+  MenuItem,
+  Button,
+  Alert,
+} from '@mui/material';
+
 const ScheduleLectures = () => {
   const dispatch = useDispatch();
   const instructors = useSelector((state) => state.instructor.instructors);
@@ -16,6 +27,8 @@ const ScheduleLectures = () => {
     duration: 60,
   });
 
+  const [error, setError] = useState('');
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -25,63 +38,122 @@ const ScheduleLectures = () => {
     const newStart = new Date(`${date}T${time}`);
     const newEnd = new Date(newStart.getTime() + duration * 60000);
 
-    return lectures.some((lecture) => {
-      if (lecture.instructorId !== instructorId || lecture.date !== date) return false;
-      const existingStart = new Date(`${lecture.date}T${lecture.time}`);
-      const existingEnd = new Date(existingStart.getTime() + lecture.duration * 60000);
-      return newStart < existingEnd && existingStart < newEnd;
+    return lectures.some((lec) => {
+      if (lec.instructorId !== instructorId || lec.date !== date) return false;
+      const lecStart = new Date(`${lec.date}T${lec.time}`);
+      const lecEnd = new Date(lecStart.getTime() + lec.duration * 60000);
+      return newStart < lecEnd && lecStart < newEnd;
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (checkConflict()) {
-      alert('Instructor already has a lecture scheduled at that time!');
+      setError('❌ This instructor already has a lecture at that time!');
       return;
     }
     dispatch(scheduleLecture(form));
-    alert('Lecture scheduled successfully!');
     setForm({ instructorId: '', courseId: '', date: '', time: '', duration: 60 });
+    setError('');
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Schedule Lecture</h2>
-      <form onSubmit={handleSubmit} className="space-y-2">
-        <select name="instructorId" value={form.instructorId} onChange={handleChange} required>
-          <option value="">Select Instructor</option>
-          {instructors.map((ins) => (
-            <option key={ins.id} value={ins.id}>
-              {ins.name}
-            </option>
-          ))}
-        </select>
+    <div style={{ padding: '1rem' }}>
+      <Typography variant="h4" gutterBottom>Schedule a Lecture</Typography>
 
-        <select name="courseId" value={form.courseId} onChange={handleChange} required>
-          <option value="">Select Course</option>
-          {courses.map((course) => (
-            <option key={course.id} value={course.id}>
-              {course.name}
-            </option>
-          ))}
-        </select>
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  select
+                  label="Instructor"
+                  name="instructorId"
+                  fullWidth
+                  required
+                  value={form.instructorId}
+                  onChange={handleChange}
+                >
+                  {instructors.map((ins) => (
+                    <MenuItem key={ins.id} value={ins.id}>
+                      {ins.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
 
-        <input type="date" name="date" value={form.date} onChange={handleChange} required />
-        <input type="time" name="time" value={form.time} onChange={handleChange} required />
-        <input
-          type="number"
-          name="duration"
-          min="15"
-          value={form.duration}
-          onChange={handleChange}
-          placeholder="Duration (mins)"
-          required
-        />
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  select
+                  label="Course"
+                  name="courseId"
+                  fullWidth
+                  required
+                  value={form.courseId}
+                  onChange={handleChange}
+                >
+                  {courses.map((course) => (
+                    <MenuItem key={course.id} value={course.id}>
+                      {course.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
 
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-          Schedule Lecture
-        </button>
-      </form>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  type="date"
+                  name="date"
+                  fullWidth
+                  required
+                  label="Date"
+                  InputLabelProps={{ shrink: true }}
+                  value={form.date}
+                  onChange={handleChange}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  type="time"
+                  name="time"
+                  fullWidth
+                  required
+                  label="Time"
+                  InputLabelProps={{ shrink: true }}
+                  value={form.time}
+                  onChange={handleChange}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  type="number"
+                  name="duration"
+                  label="Duration (mins)"
+                  fullWidth
+                  required
+                  value={form.duration}
+                  onChange={handleChange}
+                />
+              </Grid>
+
+              {error && (
+                <Grid item xs={12}>
+                  <Alert severity="error">{error}</Alert>
+                </Grid>
+              )}
+
+              <Grid item xs={12}>
+                <Button variant="contained" type="submit" fullWidth>
+                  Schedule Lecture
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };

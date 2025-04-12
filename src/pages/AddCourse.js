@@ -2,6 +2,16 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addCourse } from '../features/courses/courseSlice';
 
+import {
+  Typography,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  Box,
+} from '@mui/material';
+
 const AddCourse = () => {
   const dispatch = useDispatch();
   const courses = useSelector((state) => state.courses.courses);
@@ -19,9 +29,9 @@ const AddCourse = () => {
   };
 
   const handleBatchChange = (index, value) => {
-    const newBatches = [...form.batches];
-    newBatches[index] = value;
-    setForm({ ...form, batches: newBatches });
+    const updated = [...form.batches];
+    updated[index] = value;
+    setForm({ ...form, batches: updated });
   };
 
   const handleAddBatch = () => {
@@ -35,79 +45,106 @@ const AddCourse = () => {
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Add Course</h2>
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input
-          type="text"
-          name="name"
-          placeholder="Course Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-          className="block border p-2 w-full"
-        />
-        <input
-          type="text"
-          name="level"
-          placeholder="Level"
-          value={form.level}
-          onChange={handleChange}
-          required
-          className="block border p-2 w-full"
-        />
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-          required
-          className="block border p-2 w-full"
-        />
-        <input
-          type="text"
-          name="image"
-          placeholder="Image URL"
-          value={form.image}
-          onChange={handleChange}
-          className="block border p-2 w-full"
-        />
-        <div>
-          <label className="block font-medium">Batches:</label>
-          {form.batches.map((batch, index) => (
-            <input
-              key={index}
-              type="text"
-              value={batch}
-              onChange={(e) => handleBatchChange(index, e.target.value)}
-              className="block border p-2 w-full mb-1"
-              placeholder={`Batch ${index + 1}`}
-            />
-          ))}
-          <button
-            type="button"
-            onClick={handleAddBatch}
-            className="bg-gray-300 px-2 py-1 rounded"
-          >
-            Add Batch
-          </button>
-        </div>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-          Save Course
-        </button>
-      </form>
+    <div style={{ padding: '1rem' }}>
+      <Typography variant="h4" gutterBottom>Add Course</Typography>
 
-      <h3 className="text-lg font-bold mt-6">All Courses (Dummy View)</h3>
-      <ul className="mt-2 space-y-2">
+      <Card sx={{ mb: 4 }}>
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  name="name"
+                  label="Course Name"
+                  fullWidth
+                  required
+                  value={form.name}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  name="level"
+                  label="Course Level"
+                  fullWidth
+                  required
+                  value={form.level}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  name="description"
+                  label="Description"
+                  multiline
+                  rows={3}
+                  fullWidth
+                  required
+                  value={form.description}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  name="image"
+                  label="Image URL"
+                  fullWidth
+                  value={form.image}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="subtitle1">Batches</Typography>
+                {form.batches.map((batch, index) => (
+                  <TextField
+                    key={index}
+                    fullWidth
+                    value={batch}
+                    placeholder={`Batch ${index + 1}`}
+                    onChange={(e) => handleBatchChange(index, e.target.value)}
+                    sx={{ mb: 1 }}
+                  />
+                ))}
+                <Button variant="outlined" onClick={handleAddBatch}>
+                  Add Batch
+                </Button>
+              </Grid>
+              <Grid item xs={12}>
+                <Button type="submit" variant="contained" color="primary" fullWidth>
+                  Save Course
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Typography variant="h5" gutterBottom>All Courses</Typography>
+
+      <Grid container spacing={2}>
         {courses.map((course) => (
-          <li key={course.id} className="border p-2">
-            <strong>{course.name}</strong> ({course.level})<br />
-            {course.description}<br />
-            <img src={course.image} alt={course.name} className="w-32 h-20 object-cover mt-1" />
-            <p className="mt-1 text-sm">Batches: {course.batches.join(', ')}</p>
-          </li>
+          <Grid item xs={12} sm={6} md={4} key={course.id}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6">{course.name}</Typography>
+                <Typography variant="subtitle2" color="text.secondary">{course.level}</Typography>
+                <Typography variant="body2" sx={{ my: 1 }}>{course.description}</Typography>
+                {course.image && (
+                  <Box
+                    component="img"
+                    src={course.image}
+                    alt="Course"
+                    sx={{ width: '100%', height: 150, objectFit: 'cover', borderRadius: 1 }}
+                  />
+                )}
+                <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                  Batches: {course.batches.join(', ')}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </ul>
+      </Grid>
     </div>
   );
 };
