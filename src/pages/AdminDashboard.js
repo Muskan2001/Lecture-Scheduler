@@ -12,7 +12,7 @@ const AdminDashboard = () => {
           <Card>
             <CardContent>
               <Typography variant="h6">Total Instructors</Typography>
-              <Typography variant="h4">10</Typography>
+              <Typography variant="h4">2</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -20,7 +20,7 @@ const AdminDashboard = () => {
           <Card>
             <CardContent>
               <Typography variant="h6">Total Courses</Typography>
-              <Typography variant="h4">5</Typography>
+              <Typography variant="h4">1</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -28,7 +28,7 @@ const AdminDashboard = () => {
           <Card>
             <CardContent>
               <Typography variant="h6">Lectures Scheduled</Typography>
-              <Typography variant="h4">12</Typography>
+              <Typography variant="h4">0</Typography>
             </CardContent>
           </Card>
         </Grid>

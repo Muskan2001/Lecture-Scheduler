@@ -2,8 +2,9 @@ import { createSlice, nanoid } from '@reduxjs/toolkit';
 
 const initialState = {
   instructors: [
-    { id: '1', name: 'John Doe', email: 'john@example.com' },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com' },
+    { id: '1', name: 'Muskan', email: 'm@gmail.com' },
+    { id: '2', name: 'Shivani', email: 's@gmail.com' },
+
   ],
 };
 
